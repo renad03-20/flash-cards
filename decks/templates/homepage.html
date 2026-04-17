@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order #{{ order.order_number }} - Artist View{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+<div class="header">
+    <h1>welcome</h1>
+</div>
+<div class="option_buttons">
+    <a href="{% url 'decks:all_decks' %}" class="option_button">Create new cards</a>
+    <a href="{% url 'decks:create_deck' %}" class="option_button">study existing cards</a>
+</div>
+{% block content %}
+{% endblock %}
