@@ -4,8 +4,12 @@ from .models import Deck
 from .forms import DeckForm
 
 @login_required
-def all_deck(request):
+def home_page(request):
     all_deck = Deck.objects.all()
+
+    context = {'all_deck': all_deck}
+
+    return render(request, 'decks/templates/homepage.html', context)
 @login_required
 def create_deck(request):
     # create_deck = Deck.objects.create()
