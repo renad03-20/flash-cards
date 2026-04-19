@@ -6,7 +6,16 @@
 </head>
 <body>
 
-    {% block content %}{% endblock %}
+    <nav class="navbar">
+        <ul>
+            <li><a href="{% url 'Decks' %}">Decks</a></li>
+            <li><a href="{% url 'Add' %}">Add</a></li>
+            <li><a href="{% url 'creatr_an_account' %}">Signup</a></li>
+        </ul>
+    </nav>
+
+    {% block content %}
+    {% endblock %}
 
 </body>
 </html>
