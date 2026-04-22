@@ -3,25 +3,24 @@ from django.contrib.auth.decorators import login_required
 from .models import Deck
 from .forms import DeckForm
 
-@login_required
+# @login_required
 def home_page(request):
     all_deck = Deck.objects.all()
 
     context = {'all_deck': all_deck}
 
-    return render(request, 'decks/templates/homepage.html', context)
-@login_required
+    return render(request, 'homepage.html', context)
+# @login_required
 def create_deck(request):
-    # create_deck = Deck.objects.create()
-    form = DeckForm(request.POST)
-    if form.is_valid():
-        new_deck = form.save(commit=False)
-    
-        new_deck.user = request.user
+    if request.method == 'POST':
+        form = DeckForm(request.POST)
 
-        new_deck.save()
+        if form.is_valid():
+            new_deck = form.save(commit=False)
+            new_deck.user = request.user
+            new_deck.save()
+            return redirect('home_page')
+
     else:
         form = DeckForm()
-
-    context = {'form': form}
-    return render(request, 'decks/templates/deck_namager.html', context)
+    return render(request, 'createDeck.html', {'form': form})
