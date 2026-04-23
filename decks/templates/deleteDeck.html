@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete a deck{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <p>Are you sure you want to delete {{deck.name}}</p>
+    <input type="submit" value="Delete">
+    <a href="{% url 'home_page' %}">Cancel</a>
+</form>
+{% endblock %}
