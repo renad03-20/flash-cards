@@ -24,3 +24,12 @@ def create_deck(request):
     else:
         form = DeckForm()
     return render(request, 'createDeck.html', {'form': form})
+
+def delete_deck(request, deck_id):
+    deck = get_object_or_404(Deck, id=deck_id)
+
+    if request.method == "POST":
+        deck.delete()
+        return redirect('home_page')
+    else:
+        return render(request, 'deleteDeck.html', {'deck':deck})
