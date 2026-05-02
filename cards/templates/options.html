@@ -1,0 +1,22 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block title %}Options{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div style="border: 1px solid #ddd; padding: 40px; border-radius: 6px; margin-top: 40px;">
+            <h2 class="text-center">Options</h2>
+            <hr>
+            <a href="{% url 'study' deck.id %}" class="btn btn-default btn-block">
+                <span class="glyphicon glyphicon-lock"></span> study existing cards
+            </a>
+            <a href="{% url 'add_card' deck.id %}" class="btn btn-default btn-block"
+                <span class="glyphicon glyphicon-trash"></span> add new cards
+            </a>
+            <br>
+            <a href="{% url 'Decks' %}" class="btn btn-default btn-block">Back to Decks</a>
+        </div>
+    </div>
+{% endblock %}
