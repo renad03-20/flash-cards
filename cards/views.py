@@ -7,7 +7,7 @@ from .forms import CardForm
 
 @login_required
 def options(request, deck_id):
-    deck = get_object_or_404(Deck, id=deck_id)
+    deck = get_object_or_404(Deck, id=deck_id, user=request.user)
     return render(request, 'options.html', {'deck': deck})
 
 @login_required
@@ -20,14 +20,21 @@ def add_card(request, deck_id):
             card = form.save(commit=False)
             card.deck = deck
             card.save()
-            messages.success(request, f'cards are added now you can study them!')           
-            return redirect('study', deck_id=deck.id)
+            messages.success(request, 'Card added! Add another, or click Done to study.')          
+            return redirect('add_card', deck_id=deck.id)
     else:
         form = CardForm()
-        
-    return render(request, 'options.html', {'form': form, 'deck': deck})
+
+    card_count = Card.objects.filter(deck=deck).count()
+    return render(request, 'addCard.html', {'form': form, 'deck': deck, 'card_count': card_count})
 
 @login_required
 def study(request, deck_id):
-    deck = get_object_or_404(Deck, id=deck_id)
-    return render(request, 'study.html', {'deck': deck})
+    deck = get_object_or_404(Deck, id=deck_id, user=request.user)
+    card = Card.objects.filter(deck=deck)
+
+    if not card.exists():
+        messages.warning(request, "you havn't created cards yet")
+        return redirect('add_card', deck_id=deck.id)
+
+    return render(request, 'study.html', {'deck': deck, 'card':card})
