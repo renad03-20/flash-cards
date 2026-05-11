@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Cards - {{ deck.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div style="border: 1px solid #ddd; padding: 40px; border-radius: 6px; margin-top: 40px;">
+
+            <h2 class="text-center">{{ deck.name }}</h2>
+            <p class="text-center text-muted">{{ card_count }} card{{ card_count|pluralize }} added so far</p>
+            <hr>
+
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success btn-block">
+                    <span class="glyphicon glyphicon-plus"></span> Save & Add Another
+                </button>
+            </form>
+
+            <br>
+            <a href="{% url 'study' deck.id %}" class="btn btn-primary btn-block">
+                <span class="glyphicon glyphicon-play"></span> Done — Start Studying
+            </a>
+            <br>
+            <a href="{% url 'options' deck.id %}" class="btn btn-default btn-block">
+                <span class="glyphicon glyphicon-arrow-left"></span> Back to Options
+            </a>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
