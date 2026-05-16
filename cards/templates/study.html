@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Study - {{ deck.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background: #fff4e0;
+}
+.color-white { color: white; }
+.box-item { padding: 20px; }
+
+.flip-box {
+    position: relative;
+    width: 100%;
+    height: 475px;
+    perspective: 1000px;
+    cursor: pointer;
+}
+.flip-box-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(.4, .2, .2, 1);
+}
+.flip-box-inner.flipped {
+    transform: rotateY(180deg);
+}
+.flip-box-front,
+.flip-box-back {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: 8px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+    box-sizing: border-box;
+}
+.flip-box-front { background-color: aquamarine; }
+.flip-box-back  { background-color: aqua; transform: rotateY(180deg); }
+
+.flip-box-header { font-size: 30px; margin-bottom: 12px; }
+.flip-box p      { font-size: 20px; line-height: 1.5rem; }
+
+.flip-box-button {
+    background-color: transparent;
+    border: 2px solid #333;
+    border-radius: 2px;
+    color: #333;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+    padding: 15px 20px;
+    text-transform: uppercase;
+}
+.flip-box-button:hover { background-color: rgba(0,0,0,0.08); }
+
+/* nav buttons */
+.nav-btn {
+    background: none;
+    border: 2px solid #333;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px 28px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.nav-btn:hover { background: rgba(0,0,0,0.08); }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+.progress-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    color: #555;
+}
+
+/* slide transition */
+.card-wrapper {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.card-wrapper.hiding {
+    opacity: 0;
+    transform: translateX(40px);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 700px; margin-top: 40px;">
+
+    <h2 style="font-family: 'Courier New', Courier, monospace;">{{ deck.name }}</h2>
+
+    <!-- progress bar -->
+    <div style="margin-bottom: 16px;">
+        <div style="background: #ddd; border-radius: 4px; height: 8px;">
+            <div id="progress-bar" style="background: aquamarine; height: 8px; border-radius: 4px; transition: width 0.4s ease; width: 0%;"></div>
+        </div>
+        <p class="progress-text" id="progress-text" style="margin-top: 6px;"></p>
+    </div>
+
+    <!-- card -->
+    <div class="card-wrapper" id="card-wrapper">
+        <div class="flip-box" id="flip-box" onclick="toggleFlip()">
+            <div class="flip-box-inner" id="flip-inner">
+                <div class="flip-box-front">
+                    <div>
+                        <p class="flip-box-header">Question</p>
+                        <p id="front-text"></p>
+                        <p style="font-size:14px; color:#666; margin-top: 20px;">click to flip</p>
+                    </div>
+                </div>
+                <div class="flip-box-back">
+                    <div>
+                        <p class="flip-box-header">Answer</p>
+                        <p id="back-text"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- navigation -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 28px;">
+        <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">← Prev</button>
+        <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next →</button>
+    </div>
+
+    <!-- done button (shows on last card) -->
+    <div style="text-align:center; margin-top: 24px;">
+        <a href="{% url 'options' deck.id %}" id="done-btn"
+           style="display:none; font-family:'Courier New',Courier,monospace; font-size:18px;
+                  border: 2px solid #333; padding: 12px 32px; border-radius:4px;
+                  text-decoration:none; color:#333; font-weight:bold;">
+            ✓ Done
+        </a>
+    </div>
+
+</div>
+
+<!-- pass cards from Django into JS -->
+<script>
+    const cards = [
+        {% for c in cards %}
+        { front: "{{ c.front_q|escapejs }}", back: "{{ c.back_a|escapejs }}" },
+        {% endfor %}
+    ];
+
+    let current = 0;
+
+    function showCard(index, direction) {
+        const wrapper = document.getElementById('card-wrapper');
+
+        // slide out
+        wrapper.classList.add('hiding');
+
+        setTimeout(() => {
+            current = index;
+
+            // reset flip
+            document.getElementById('flip-inner').classList.remove('flipped');
+
+            // update text
+            document.getElementById('front-text').textContent = cards[current].front;
+            document.getElementById('back-text').textContent  = cards[current].back;
+
+            // update progress
+            const total = cards.length;
+            const pct   = Math.round(((current + 1) / total) * 100);
+            document.getElementById('progress-bar').style.width = pct + '%';
+            document.getElementById('progress-text').textContent = `Card ${current + 1} of ${total}`;
+
+            // update buttons
+            document.getElementById('prev-btn').disabled = (current === 0);
+            document.getElementById('next-btn').disabled = (current === total - 1);
+            document.getElementById('done-btn').style.display = (current === total - 1) ? 'inline-block' : 'none';
+
+            // slide in
+            wrapper.classList.remove('hiding');
+        }, 300);
+    }
+
+    function toggleFlip() {
+        document.getElementById('flip-inner').classList.toggle('flipped');
+    }
+
+    function navigate(dir) {
+        const next = current + dir;
+        if (next >= 0 && next < cards.length) {
+            showCard(next, dir);
+        }
+    }
+
+    // init
+    showCard(0, 1);
+</script>
+{% endblock %}

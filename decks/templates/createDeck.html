@@ -1,14 +1,25 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Create a deck{% endblock %}
+{% block title %}Create a Deck{% endblock %}
 
-{% block extra_css %}
-{% endblock %}
 {% block content %}
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Submit">
-</form>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <div style="border: 1px solid #ddd; padding: 40px; border-radius: 6px; margin-top: 40px;">
+            <h2 class="text-center">Create a New Deck</h2>
+            <hr>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span class="glyphicon glyphicon-floppy-disk"></span> Create Deck
+                </button>
+            </form>
+            <br>
+            <a href="{% url 'add_card' %}" class="btn btn-default btn-block">add cards to this deck</a>
+            <a href="{% url 'Decks' %}" class="btn btn-default btn-block">Cancel</a>
+        </div>
+    </div>
+</div>
 {% endblock %}

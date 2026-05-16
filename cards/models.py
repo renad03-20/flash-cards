@@ -6,3 +6,6 @@ class Card(models.Model):
     front_q = models.TextField()
     back_a = models.TextField()
     created_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.front_q}"

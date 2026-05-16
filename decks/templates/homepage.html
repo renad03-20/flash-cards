@@ -1,29 +1,54 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Order #{{ order.order_number }} - Artist View{% endblock %}
+{% block title %}My Decks{% endblock %}
 
-{% block extra_css %}
-{% endblock %}
-    <table border="1">
-        <tr>
-            <th>deck</th>
-            <th>new</th>
-            <th>learn</th>
-            <th>due</th>
-        </tr>
-        {% for deck in all_dekcs %}
-        <tr>
-            <td>{{ deck.name }}</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="4">No decks yet</td>
-        </tr>
-        {% endfor %}
-    </table>
 {% block content %}
+<div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        <h2>My Decks</h2>
+        <hr>
+
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Deck</th>
+                    <th>New</th>
+                    <th>Learning</th>
+                    <th>Due</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for deck in all_deck %}
+                <tr>
+                    <td>
+                        <a href="{% url 'options' deck.id %}">{{ deck.name }}</a>  {# clicking deck goes to options #}
+                    </td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>
+                        <form method="POST" action="{% url 'delete_deck' deck.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-xs"
+                                onclick="return confirm('Delete this deck?')">
+                                <span class="glyphicon glyphicon-trash"></span> Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No decks yet. Create your first one!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{% url 'create_deck' %}" class="btn btn-primary">
+            <span class="glyphicon glyphicon-plus"></span> Create New Deck
+        </a>
+    </div>
+</div>
 {% endblock %}
